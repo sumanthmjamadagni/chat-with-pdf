@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://backend-chat-pdf.onrender.com/";
+const BACKEND_URL = "https://backend-chat-pdf.onrender.com";
 
 async function uploadPDF() {
     const fileInput = document.getElementById("pdfFile");
@@ -20,7 +20,7 @@ async function uploadPDF() {
     });
 
     const data = await res.json();
-    status.innerText = data.message;
+    status.innerText = "PDF Uploaded successfully!";
 }
 
 async function askQuestion() {
