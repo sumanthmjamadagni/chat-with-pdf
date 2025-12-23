@@ -1,9 +1,12 @@
-from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from app.config import VECTORSTORE_DIR
 import os
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# VERY LIGHT MODEL (fits in 512MB)
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/paraphrase-MiniLM-L3-v2"
+)
 
 def create_vectorstore(chunks):
     db = FAISS.from_documents(chunks, embeddings)
@@ -17,6 +20,6 @@ def load_vectorstore():
         allow_dangerous_deserialization=True
     )
 
-def retrieve_chunks(question, k=3):
+def retrieve_chunks(question: str, k: int = 3):
     db = load_vectorstore()
     return db.similarity_search(question, k=k)
