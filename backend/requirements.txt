@@ -1,8 +1,5 @@
 fastapi
 uvicorn
-langchain
-langchain-community
-faiss-cpu
-sentence-transformers
 pypdf
 python-multipart
+scikit-learn

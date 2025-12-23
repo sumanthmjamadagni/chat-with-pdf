@@ -1,25 +1,26 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from app.config import VECTORSTORE_DIR
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pickle
 import os
+from app.config import VECTORSTORE_DIR
 
-# VERY LIGHT MODEL (fits in 512MB)
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/paraphrase-MiniLM-L3-v2"
-)
+VEC_PATH = os.path.join(VECTORSTORE_DIR, "tfidf.pkl")
 
 def create_vectorstore(chunks):
-    db = FAISS.from_documents(chunks, embeddings)
-    db.save_local(VECTORSTORE_DIR)
-    return db
+    texts = [c.page_content for c in chunks]
 
-def load_vectorstore():
-    return FAISS.load_local(
-        VECTORSTORE_DIR,
-        embeddings,
-        allow_dangerous_deserialization=True
-    )
+    vectorizer = TfidfVectorizer(stop_words="english")
+    vectors = vectorizer.fit_transform(texts)
 
-def retrieve_chunks(question: str, k: int = 3):
-    db = load_vectorstore()
-    return db.similarity_search(question, k=k)
+    with open(VEC_PATH, "wb") as f:
+        pickle.dump((vectorizer, vectors, chunks), f)
+
+def retrieve_chunks(question, k=3):
+    with open(VEC_PATH, "rb") as f:
+        vectorizer, vectors, chunks = pickle.load(f)
+
+    q_vec = vectorizer.transform([question])
+    scores = cosine_similarity(q_vec, vectors)[0]
+
+    top_k = scores.argsort()[-k:][::-1]
+    return [chunks[i] for i in top_k]
