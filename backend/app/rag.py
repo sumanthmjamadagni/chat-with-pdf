@@ -1,39 +1,22 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from app.config import VECTORSTORE_DIR
 import os
 
-
-def get_embeddings():
-    # Lazy-load embeddings to avoid Render OOM
-    return HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 def create_vectorstore(chunks):
-    embeddings = get_embeddings()
     db = FAISS.from_documents(chunks, embeddings)
     db.save_local(VECTORSTORE_DIR)
     return db
 
-
 def load_vectorstore():
-    if not os.path.exists(VECTORSTORE_DIR):
-        raise RuntimeError("Vectorstore not found")
-
-    embeddings = get_embeddings()
     return FAISS.load_local(
         VECTORSTORE_DIR,
         embeddings,
         allow_dangerous_deserialization=True
     )
 
-
-def retrieve_chunks(question: str, k: int = 3):
-    """
-    Retrieve top-k relevant chunks for a question.
-    """
+def retrieve_chunks(question, k=3):
     db = load_vectorstore()
-    docs = db.similarity_search(question, k=k)
-    return docs
+    return db.similarity_search(question, k=k)
