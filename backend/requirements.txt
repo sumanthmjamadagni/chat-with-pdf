@@ -4,3 +4,5 @@ pypdf
 python-multipart
 scikit-learn
 langchain
+langchain-core
+langchain-text-splitters
