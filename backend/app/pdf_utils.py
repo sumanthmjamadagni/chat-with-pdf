@@ -1,35 +1,32 @@
 import os
-import shutil
-from fastapi import UploadFile, HTTPException
+from pypdf import PdfReader
 from app.config import UPLOAD_DIR
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-
-def save_pdf(file: UploadFile) -> str:
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
-
+def save_pdf(file):
     file_path = os.path.join(UPLOAD_DIR, file.filename)
-
-    try:
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to save PDF")
-
+    with open(file_path, "wb") as f:
+        f.write(file.file.read())
     return file_path
 
+def load_and_split_pdf(file_path):
+    reader = PdfReader(file_path)
+    documents = []
 
-def load_and_split_pdf(file_path: str):
-    loader = PyPDFLoader(file_path)
-    pages = loader.load()
+    for page_num, page in enumerate(reader.pages):
+        text = page.extract_text()
+        if text:
+            documents.append(
+                Document(
+                    page_content=text,
+                    metadata={"page": page_num + 1}
+                )
+            )
 
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50
     )
 
-    chunks = splitter.split_documents(pages)
-    return chunks
+    return splitter.split_documents(documents)

@@ -3,3 +3,4 @@ uvicorn
 pypdf
 python-multipart
 scikit-learn
+langchain
