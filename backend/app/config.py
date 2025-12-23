@@ -1,16 +1,14 @@
 import os
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-print("DEBUG: OPENAI_API_KEY loaded:", bool(OPENAI_API_KEY))
-
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY not set")
-
+# Base directory of backend
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Upload and vectorstore directories
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 VECTORSTORE_DIR = os.path.join(BASE_DIR, "vectorstore")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(VECTORSTORE_DIR, exist_ok=True)
+
+# Optional OpenAI API key (not required for this deployment)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
