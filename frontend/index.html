@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat with PDF</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <h1> Chat with Your PDF</h1>
+  <p class="subtitle">Ask questions and get answers directly from your document</p>
+
+  <div class="card">
+    <label>Upload PDF</label>
+    <input type="file" id="pdfFile" accept=".pdf">
+    <button onclick="uploadPDF()">Upload</button>
+    <span id="uploadStatus"></span>
+  </div>
+
+  <div class="card">
+    <label>Ask a Question</label>
+    <input type="text" id="question" placeholder="e.g. What is the objective?">
+    <button onclick="askQuestion()">Ask</button>
+  </div>
+
+  <div class="card answer-card">
+    <h3>Answer</h3>
+    <p id="answer">Waiting for your question...</p>
+    <p id="sources"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
